@@ -3,7 +3,7 @@ import os
 import pandas as pd
 import re
 
-import nltk
+#import nltk
 from nltk.corpus import stopwords
 #from nltk.stem.porter import PorterStemmer
 #ps = PorterStemmer()
@@ -17,6 +17,7 @@ snowball = SnowballStemmer("english")
  # declaring WordNetLemmatizer
 lemmatizer = WordNetLemmatizer()
 path = os.getcwd()
+
 all_files = os.listdir(path)
 
 #import chardet
@@ -62,42 +63,20 @@ for i in range(df.shape[0]):
 
 # to find the length of each lines after splitting
 df['length']= df['lines_split'].apply(lambda x: len(x))
-
-# to find the minimum value in length column
-min(df['length'])
-
-df.reset_index()
-
-li =[]
-j=0
-
-for i in range(df.shape[0]):
-    if df['length'][i] < 3:
-       print (i)
-       print(df['lines_split'][i])
-       li[j] = i
-       j = j+1
-       
-       # need to check from here
-       
-df2 = df
-
-for i in range(df2.shape[0]):
-    if df2['length'][i] < 3 :        
-        df2 = df2.drop([i]).reset_index(drop=True)
-
+    
 ## Data Preparation Phase (removing Stop Words, Stemming and Lemmatization)
 
-# clean_review = []
-df
+ls = []
+
 def data_cleaning(text,i):
    #text = df['Lines'][i]
    #print (i)
    print(text)
    print(i)
-   if text.strip() == '':
-       print(text)
-       df.drop(df['Lines'][i],axis =0)
+   if text.strip() == '' or df['length'][i] < 3 :
+       ls.append(i)
+       #print(text)
+      # df.drop(df['Lines'][i],axis =0)
        return
    elif (type(text)) == str:
        text = text.lower()
@@ -123,9 +102,18 @@ def data_cleaning(text,i):
    return text   
  
 for i in range(df.shape[0]):
-    text = df['Lines'][i][2]
-    if text.strip()== '':
-        df.drop(df['Lines'][i],axis =0)
-        continue
-    df['Lines'][i][2] = data_cleaning(text,i)
+    text = df['Lines'][i]
+    #j = df['length'][i]
+    df['Lines'][i] = data_cleaning(text,i)
+
+# deleteing all the rows that have no tweet data
+os = ls.reverse()
+
+for i in ls:
+    print(i)
+    df.drop(df.index[i])
+df.reset_index()
+
+    
+    
 
