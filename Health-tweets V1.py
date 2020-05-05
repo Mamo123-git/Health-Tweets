@@ -87,10 +87,10 @@ def data_cleaning(text,i):
        return
    else:
        text = text.lower()
-       text = re.sub(r'http:\/\/.*', '', text)
+       text = re.sub(r'http:\/\/.*',' ', text)
      # text = re.sub(r'\r\n', " ", text)
-       text = re.sub(r"[-()\"#/@;:<>{}`+=~.!?,%]", "", text)
-       text = re.sub(r"[0-9]", "", text)              
+       text = re.sub(r"[-()\"#/@;:<>{}`+=~.!?,%]",' ', text)
+       text = re.sub(r"[0-9]", " ", text)              
        text= word_tokenize(text)
                # stemming and removing stop words
        text = [snowball.stem(word) for word in text if not word in set(stopwords.words('english'))]
