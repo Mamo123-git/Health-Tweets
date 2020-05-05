@@ -64,27 +64,33 @@ for i in range(df.shape[0]):
 # to find the length of each lines after splitting
 df['length']= df['lines_split'].apply(lambda x: len(x))
     
-## Data Preparation Phase (removing Stop Words, Stemming and Lemmatization)
+# Data frame with Split Data 
 
+Split_data = df.iloc[:,[1]]
+Split_data
+
+
+df2= pd.DataFrame(Split_data.lines_split.values.tolist(),index=Split_data.index)
+
+# df2 is the new data frame with split data
+df2.columns = ['Sl_No','Date','tweets']
+
+## Data Preparation Phase (removing Stop Words, Stemming and Lemmatization)
 ls = []
 
 def data_cleaning(text,i):
-   #text = df['Lines'][i]
-   #print (i)
    print(text)
    print(i)
-   if text.strip() == '' or df['length'][i] < 3 :
+   if text == '' or text == None:
+       print(text)
        ls.append(i)
-       #print(text)
-      # df.drop(df['Lines'][i],axis =0)
        return
-   elif (type(text)) == str:
+   else:
        text = text.lower()
        text = re.sub(r'http:\/\/.*', '', text)
-       text = re.sub(r'\r\n', "", text)
-       text = re.sub(r"[-()\"#/@;:<>{}`+=~.!?,%'']", "", text)
-       text = re.sub(r"[0-9]", "", text)
-              # text = text.split()
+     # text = re.sub(r'\r\n', " ", text)
+       text = re.sub(r"[-()\"#/@;:<>{}`+=~.!?,%]", "", text)
+       text = re.sub(r"[0-9]", "", text)              
        text= word_tokenize(text)
                # stemming and removing stop words
        text = [snowball.stem(word) for word in text if not word in set(stopwords.words('english'))]
@@ -92,28 +98,23 @@ def data_cleaning(text,i):
        text = [lemmatizer.lemmatize(token) for token in text]
        text = ''.join(text)
        if text.strip() == '':
-           print(text)
-           df.drop(df['Lines'][i],axis =0)
-       # stemSentence(text)
-       #df['Lines'][i][2]= text
-       #clean_review.append(text)
-   else:   
-        return text
-   return text   
+           ls.append(i)
+           return       
+   return text
  
 for i in range(df.shape[0]):
-    text = df['Lines'][i]
-    #j = df['length'][i]
-    df['Lines'][i] = data_cleaning(text,i)
+    text = df2['tweets'][i]
+    df2['tweets'][i] = data_cleaning(text,i)
 
 # deleteing all the rows that have no tweet data
-os = ls.reverse()
 
-for i in ls:
-    print(i)
-    df.drop(df.index[i])
-df.reset_index()
-
+if bool(ls):
+    ls.reverse()
+    for i in ls:
+        print(i)
+        df2.drop(index= i)
     
+
+df2.reset_index()   
     
 
